@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ArrowUp, Loader2 } from "lucide-react";
+import { CATEGORY_LABELS } from "@/constants/chat";
 import type { Category } from "@/lib/knowledgeBase";
 
 interface ChatInputProps {
@@ -30,10 +31,7 @@ export function ChatInput({ onSubmit, isProcessing, activeCategory }: ChatInputP
           <div className="flex items-center gap-2 px-1">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             <span className="text-[11px] font-medium text-accent-foreground bg-accent/70 px-2.5 py-1 rounded-full border border-primary/20">
-              {activeCategory === "HR Policies" ? "Políticas de RH" :
-               activeCategory === "IT Support" ? "Suporte de TI" :
-               activeCategory === "Engineering Docs" ? "Docs de Engenharia" :
-               activeCategory === "Onboarding" ? "Integração" : activeCategory}
+              {CATEGORY_LABELS[activeCategory]}
             </span>
           </div>
         )}

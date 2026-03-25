@@ -2,15 +2,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { SourceCard } from "./SourceCard";
 import { User, Bot } from "lucide-react";
-import type { KBDocument } from "@/lib/knowledgeBase";
-
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  sources?: KBDocument[];
-  timestamp: Date;
-}
+import type { KBDocument, ChatMessage } from "@/lib/knowledgeBase";
 
 interface MessageBubbleProps {
   message: ChatMessage;

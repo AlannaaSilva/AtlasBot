@@ -1,60 +1,31 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ChatSidebar } from "@/components/ChatSidebar";
-import { MessageBubble, type ChatMessage } from "@/components/MessageBubble";
+import { MessageBubble } from "@/components/MessageBubble";
 import { ChatInput } from "@/components/ChatInput";
 import { RetrievalStatus } from "@/components/RetrievalStatus";
 import { DocumentPanel } from "@/components/DocumentPanel";
+import { Typewriter } from "@/components/Typewriter";
 import { Sparkles, MessageCircle, Zap, Home } from "lucide-react";
-import {
-  retrieveDocuments,
-  generateResponse,
-  type Category,
-  type KBDocument,
+import { 
+  type Category, 
+  type KBDocument 
 } from "@/lib/knowledgeBase";
-
-const EXAMPLE_QUERIES = [
-  "Como solicitar férias?",
-  "Como abrir um chamado de suporte?",
-  "Qual é o processo de deploy?",
-  "Onde encontro a documentação de onboarding?",
-];
-
-const QUERY_ICONS = ["🏖️", "🎫", "🚀", "📋"];
-
-function Typewriter({ text, delay = 50 }: { text: string; delay?: number }) {
-  const [currentText, setCurrentText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timeout = setTimeout(() => {
-        setCurrentText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, delay);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, delay, text]);
-
-  return (
-    <span className="flex items-center justify-center">
-      {currentText}
-      <span 
-        className={`inline-block w-1.5 h-[1em] bg-primary ml-1.5 rounded-sm ${currentIndex < text.length ? 'animate-pulse' : 'animate-pulse opacity-50'}`} 
-      />
-    </span>
-  );
-}
+import { useChat } from "@/hooks/use-chat";
+import { EXAMPLE_QUERIES } from "@/constants/chat";
 
 export default function Index() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const {
+    messages,
+    isProcessing,
+    retrievalStage,
+    retrievalProgress,
+    handleSubmit,
+    clearChat,
+  } = useChat();
+
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [recentQueries, setRecentQueries] = useState<string[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [retrievalStage, setRetrievalStage] = useState<
-    "searching" | "retrieving" | "generating" | null
-  >(null);
-  const [retrievalProgress, setRetrievalProgress] = useState(0);
   const [selectedDoc, setSelectedDoc] = useState<KBDocument | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -69,56 +40,18 @@ export default function Index() {
 
   useEffect(scrollToBottom, [messages, retrievalStage, scrollToBottom]);
 
-  const handleSubmit = async (query: string) => {
-    setIsProcessing(true);
+  const onMessageSubmit = async (query: string) => {
     setRecentQueries((prev) => [query, ...prev.filter((q) => q !== query)]);
-
-    const userMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: query,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, userMsg]);
-
-    setRetrievalStage("searching");
-    setRetrievalProgress(20);
-    await delay(600);
-
-    setRetrievalStage("retrieving");
-    setRetrievalProgress(55);
-    const sources = retrieveDocuments(query);
-    await delay(500);
-
-    setRetrievalStage("generating");
-    setRetrievalProgress(85);
-    const response = generateResponse(query, sources);
-    await delay(700);
-
-    setRetrievalProgress(100);
-    await delay(200);
-
-    setRetrievalStage(null);
-    setRetrievalProgress(0);
-
-    const assistantMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: "assistant",
-      content: response,
-      sources: sources.map((s) => s.document),
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, assistantMsg]);
-    setIsProcessing(false);
+    await handleSubmit(query);
   };
 
   return (
     <div className="flex h-screen text-foreground antialiased">
-      <ChatSidebar
+    <ChatSidebar
         activeCategory={activeCategory}
         onCategorySelect={setActiveCategory}
         recentQueries={recentQueries}
-        onQuerySelect={handleSubmit}
+        onQuerySelect={onMessageSubmit}
       />
 
       <main className="flex-1 flex flex-col relative bg-background min-w-0">
@@ -136,11 +69,7 @@ export default function Index() {
           <div className="flex items-center gap-2 sm:gap-3">
             {messages.length > 0 && (
               <button
-                onClick={() => {
-                  setMessages([]);
-                  setRetrievalStage(null);
-                  setRetrievalProgress(0);
-                }}
+                onClick={clearChat}
                 className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-background hover:bg-accent text-foreground transition-all duration-200 text-xs font-medium border border-border shadow-sm group hover:border-primary/40 hover:shadow-md"
               >
                 <Home size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
@@ -179,14 +108,14 @@ export default function Index() {
               
               {/* Quick Actions Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
-                {EXAMPLE_QUERIES.map((q, i) => (
+                {EXAMPLE_QUERIES.map((q) => (
                   <button
-                    key={q}
-                    onClick={() => handleSubmit(q)}
+                    key={q.text}
+                    onClick={() => onMessageSubmit(q.text)}
                     className="text-left px-5 py-5 text-sm text-foreground/80 bg-card rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:border-primary/30 hover:text-foreground hover:bg-accent/30 transition-all duration-300 flex items-start gap-4 group"
                   >
-                    <span className="text-2xl shrink-0 group-hover:scale-110 transition-transform">{QUERY_ICONS[i]}</span>
-                    <span className="group-hover:text-foreground transition-colors font-medium">{q}</span>
+                    <span className="text-2xl shrink-0 group-hover:scale-110 transition-transform">{q.icon}</span>
+                    <span className="group-hover:text-foreground transition-colors font-medium">{q.text}</span>
                   </button>
                 ))}
               </div>
@@ -218,7 +147,7 @@ export default function Index() {
 
         {/* Input */}
         <ChatInput
-          onSubmit={handleSubmit}
+          onSubmit={onMessageSubmit}
           isProcessing={isProcessing}
           activeCategory={activeCategory}
         />
@@ -227,8 +156,4 @@ export default function Index() {
       <DocumentPanel document={selectedDoc} onClose={() => setSelectedDoc(null)} />
     </div>
   );
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

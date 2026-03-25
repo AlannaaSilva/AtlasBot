@@ -1,3 +1,11 @@
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sources?: KBDocument[];
+  timestamp: Date;
+}
+
 export interface KBDocument {
   id: string;
   title: string;
@@ -5,6 +13,8 @@ export interface KBDocument {
   content: string;
   version: string;
 }
+
+export type Category = KBDocument["category"];
 
 export const knowledgeBase: KBDocument[] = [
   {
@@ -145,7 +155,7 @@ export function generateResponse(
   return response;
 }
 
-export type Category = KBDocument["category"];
+
 
 export const categories: Category[] = [
   "HR Policies",
