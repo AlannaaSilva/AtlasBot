@@ -1,8 +1,33 @@
-# Assistente de Conhecimento Corporativo
+# AtlasBot
 
-This project is a React Single Page Application built with Vite, TypeScript, and Tailwind CSS.
+Este projeto está dividido em pastas de frontend e backend para melhor organização.
 
-## Technologies Used
+## Estrutura do Projeto
+
+- `/front`: Aplicação React Single Page construída com Vite, TypeScript e Tailwind CSS.
+- `/back`: Diretório reservado para o desenvolvimento do backend.
+
+## Como Iniciar
+
+### Frontend
+
+Para rodar o frontend localmente:
+
+1. Navegue até a pasta `front`:
+   ```bash
+   cd front
+   ```
+2. Certifique-se de ter o Node.js e o Yarn instalados.
+3. Instale as dependências:
+   ```bash
+   yarn install
+   ```
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   yarn dev
+   ```
+
+## Tecnologias Utilizadas (Frontend)
 
 - Vite
 - TypeScript
@@ -11,25 +36,3 @@ This project is a React Single Page Application built with Vite, TypeScript, and
 - Tailwind CSS
 - React Query
 - React Router
-
-## Getting Started
-
-To run this project locally, follow these steps:
-
-1. Ensure you have Node.js and Yarn installed.
-2. Install dependencies:
-   ```bash
-   yarn install
-   ```
-3. Start the development server:
-   ```bash
-   yarn dev
-   ```
-
-## Available Scripts
-
-- `yarn dev`: Starts the development server.
-- `yarn build`: Builds the project for production.
-- `yarn preview`: Runs the built app locally for preview.
-- `yarn lint`: Runs ESLint for code formatting/linting rules.
-- `yarn test`: Runs unit tests using Vitest.
