@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 30% 98%;
+    --foreground: 260 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 260 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 25% 12%;
+
+    --primary: 265 75% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 280 80% 65%;
+
+    --secondary: 260 20% 94%;
+    --secondary-foreground: 260 25% 12%;
+
+    --muted: 260 20% 94%;
+    --muted-foreground: 260 15% 45%;
+
+    --accent: 265 75% 96%;
+    --accent-foreground: 265 75% 35%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 260 20% 88%;
+    --input: 260 20% 88%;
+    --ring: 265 75% 55%;
+
+    --radius: 0.875rem;
+
+    --subtle-bg: 260 30% 98%;
+    --source-tag-bg: 265 70% 96%;
+    --source-tag-text: 265 65% 45%;
+
+    --sidebar-background: 260 30% 15%;
+    --sidebar-foreground: 260 15% 75%;
+    --sidebar-primary: 280 80% 75%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 25% 22%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 260 25% 24%;
+    --sidebar-ring: 265 75% 55%;
+    --sidebar-muted: 260 15% 45%;
+
+    --shadow-card: 0 1px 3px rgba(88, 28, 135, 0.04), 0 4px 12px rgba(88, 28, 135, 0.03);
+    --shadow-card-hover: 0 4px 20px rgba(88, 28, 135, 0.08), 0 1px 3px rgba(88, 28, 135, 0.04);
+    --shadow-input: 0 0 0 1px rgba(88, 28, 135, 0.06), 0 1px 2px rgba(88, 28, 135, 0.04);
+    --shadow-input-focus: 0 0 0 2px hsl(265 75% 55% / 0.15), 0 0 0 1px hsl(265 75% 55% / 0.3);
+    --shadow-elevated: 0 8px 30px rgba(88, 28, 135, 0.08), 0 2px 8px rgba(88, 28, 135, 0.04);
+
+    --gradient-hero: linear-gradient(135deg, hsl(265 75% 55%), hsl(280 80% 65%));
+    --gradient-surface: linear-gradient(180deg, hsl(260 30% 98%), hsl(260 30% 95%));
+  }
+
+  .dark {
+    --background: 260 30% 8%;
+    --foreground: 260 15% 96%;
+    --card: 260 25% 12%;
+    --card-foreground: 260 15% 96%;
+    --popover: 260 25% 12%;
+    --popover-foreground: 260 15% 96%;
+    --primary: 265 75% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 280 80% 72%;
+    --secondary: 260 20% 18%;
+    --secondary-foreground: 260 15% 96%;
+    --muted: 260 20% 18%;
+    --muted-foreground: 260 15% 55%;
+    --accent: 265 40% 22%;
+    --accent-foreground: 265 75% 85%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 260 20% 20%;
+    --input: 260 20% 20%;
+    --ring: 265 75% 65%;
+    --sidebar-background: 260 35% 8%;
+    --sidebar-foreground: 260 15% 70%;
+    --sidebar-primary: 265 75% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 25% 14%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 260 25% 16%;
+    --sidebar-ring: 265 75% 65%;
+    --sidebar-muted: 260 15% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .glass-surface {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+}
