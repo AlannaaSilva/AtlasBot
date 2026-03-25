@@ -5,7 +5,7 @@ import { MessageBubble, type ChatMessage } from "@/components/MessageBubble";
 import { ChatInput } from "@/components/ChatInput";
 import { RetrievalStatus } from "@/components/RetrievalStatus";
 import { DocumentPanel } from "@/components/DocumentPanel";
-import { Sparkles, MessageCircle, Zap } from "lucide-react";
+import { Sparkles, MessageCircle, Zap, Home } from "lucide-react";
 import {
   retrieveDocuments,
   generateResponse,
@@ -21,6 +21,30 @@ const EXAMPLE_QUERIES = [
 ];
 
 const QUERY_ICONS = ["🏖️", "🎫", "🚀", "📋"];
+
+function Typewriter({ text, delay = 50 }: { text: string; delay?: number }) {
+  const [currentText, setCurrentText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setCurrentText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, delay);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, delay, text]);
+
+  return (
+    <span className="flex items-center justify-center">
+      {currentText}
+      <span 
+        className={`inline-block w-1.5 h-[1em] bg-primary ml-1.5 rounded-sm ${currentIndex < text.length ? 'animate-pulse' : 'animate-pulse opacity-50'}`} 
+      />
+    </span>
+  );
+}
 
 export default function Index() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -109,11 +133,26 @@ export default function Index() {
               <p className="text-[11px] text-muted-foreground">Base de conhecimento interna</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/60 border border-primary/20">
-            <Zap size={14} className="text-primary" />
-            <span className="text-[11px] font-medium text-accent-foreground tabular-nums">
-              IA Ativa
-            </span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {messages.length > 0 && (
+              <button
+                onClick={() => {
+                  setMessages([]);
+                  setRetrievalStage(null);
+                  setRetrievalProgress(0);
+                }}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-background hover:bg-accent text-foreground transition-all duration-200 text-xs font-medium border border-border shadow-sm group hover:border-primary/40 hover:shadow-md"
+              >
+                <Home size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                <span className="hidden sm:inline">Início</span>
+              </button>
+            )}
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-accent/60 border border-primary/20">
+              <Zap size={14} className="text-primary" />
+              <span className="hidden sm:inline text-[11px] font-medium text-accent-foreground tabular-nums">
+                IA Ativa
+              </span>
+            </div>
           </div>
         </header>
 
@@ -129,8 +168,8 @@ export default function Index() {
                   <Sparkles size={32} className="text-primary-foreground" />
                 </div>
                 <div className="space-y-3">
-                  <h2 className="text-2xl font-semibold text-foreground">
-                    Como posso ajudar?
+                  <h2 className="text-2xl font-semibold text-foreground flex justify-center">
+                    <Typewriter text="Como posso ajudar?" delay={60} />
                   </h2>
                   <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
                     Pergunte sobre políticas de RH, suporte de TI, processos de engenharia ou integração de novos colaboradores.

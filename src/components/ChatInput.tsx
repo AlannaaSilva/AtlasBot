@@ -37,7 +37,7 @@ export function ChatInput({ onSubmit, isProcessing, activeCategory }: ChatInputP
             </span>
           </div>
         )}
-        <div className="relative group">
+        <div className="relative group flex items-center">
           <input
             ref={inputRef}
             type="text"
@@ -46,17 +46,17 @@ export function ChatInput({ onSubmit, isProcessing, activeCategory }: ChatInputP
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder="Digite sua pergunta sobre processos internos..."
             disabled={isProcessing}
-            className="w-full pl-6 pr-16 py-4.5 bg-card rounded-2xl border border-border/70 shadow-input-rest focus:shadow-input-focus focus:border-primary/40 focus:outline-none transition-all duration-300 text-sm placeholder:text-muted-foreground/70 disabled:opacity-50"
+            className="w-full pl-6 pr-20 py-5 bg-card rounded-2xl border border-border/70 shadow-sm focus:shadow-md focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus:outline-none transition-all duration-300 text-base placeholder:text-muted-foreground/60 disabled:opacity-50"
           />
           <button
             onClick={handleSubmit}
             disabled={isProcessing || !value.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-30 disabled:from-muted disabled:to-muted disabled:shadow-none"
+            className="absolute right-3 p-3.5 bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-30 disabled:from-muted disabled:to-muted disabled:shadow-none flex items-center justify-center"
           >
             {isProcessing ? (
               <Loader2 size={18} className="animate-spin" />
             ) : (
-              <ArrowUp size={18} />
+              <ArrowUp size={18} strokeWidth={2.5} />
             )}
           </button>
         </div>
