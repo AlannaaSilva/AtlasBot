@@ -6,7 +6,7 @@ import { ChatInput } from "@/components/ChatInput";
 import { RetrievalStatus } from "@/components/RetrievalStatus";
 import { DocumentPanel } from "@/components/DocumentPanel";
 import { Typewriter } from "@/components/Typewriter";
-import { Sparkles, MessageCircle, Zap, Home } from "lucide-react";
+import { Sparkles, MessageCircle, Zap, Home, LogOut } from "lucide-react";
 import { 
   type Category, 
   type KBDocument 
@@ -14,7 +14,11 @@ import {
 import { useChat } from "@/hooks/use-chat";
 import { EXAMPLE_QUERIES } from "@/constants/chat";
 
-export default function Index() {
+interface IndexProps {
+  onLogout?: () => void;
+}
+
+export default function Index({ onLogout }: IndexProps) {
   const {
     messages,
     isProcessing,
@@ -82,6 +86,16 @@ export default function Index() {
                 IA Ativa
               </span>
             </div>
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-destructive/10 hover:bg-destructive/20 text-destructive transition-all duration-200 text-xs font-medium border border-destructive/20 shadow-sm group"
+                title="Sair"
+              >
+                <LogOut size={14} />
+                <span className="hidden sm:inline">Sair</span>
+              </button>
+            )}
           </div>
         </header>
 
