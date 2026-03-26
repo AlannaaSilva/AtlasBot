@@ -51,7 +51,10 @@ ${context}`,
 
   return {
     answer: completion.choices[0].message.content,
-    sources: topChunks.map((c: any) => c.metadata),
+    sources: topChunks.map((c: any) => ({
+      content: c.content,
+      ...c.metadata,
+    })),
   };
 }
 
