@@ -14,8 +14,9 @@ app.use(express.json());
 app.get("/health", (_, res) => res.json({ status: "ok", project: "AtlasBot" }));
 app.use("/api/chat", chatRouter);
 
+app.use("/api/auth", authRouter);
+
 app.listen(PORT, () =>
   console.log(`AtlasBot backend rodando na porta ${PORT}`),
 );
 
-app.use("/api/auth", authRouter);
