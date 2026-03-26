@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import chatRouter from "./routes/chat";
+import authRouter from "./routes/auth";
 dotenv.config();
 
 const app = express();
@@ -16,3 +17,5 @@ app.use("/api/chat", chatRouter);
 app.listen(PORT, () =>
   console.log(`AtlasBot backend rodando na porta ${PORT}`),
 );
+
+app.use("/api/auth", authRouter);
