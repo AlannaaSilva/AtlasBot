@@ -4,7 +4,7 @@ import { RetrievalStage, RETRIEVAL_STAGES } from "@/constants/chat";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 function getToken(): string | null {
   return localStorage.getItem("atlasbot_token");

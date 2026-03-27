@@ -24,7 +24,8 @@ export default function Login({ onLogin }: Props) {
     setError('')
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001"
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -134,15 +135,10 @@ export default function Login({ onLogin }: Props) {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col bg-muted/30 border-t border-border/50 p-6 space-y-3 rounded-b-xl">
+        <CardFooter className="flex flex-col bg-muted/30 border-t border-border/50 p-6 rounded-b-xl">
           <p className="text-[11px] text-center text-muted-foreground/70 font-medium tracking-wide">
-            CREDENCIAIS DE DEMONSTRAÇÃO
+            Entre em contato com o administrador para obter suas credenciais.
           </p>
-          <div className="flex justify-center gap-4 text-[13px] font-mono bg-background/50 px-4 py-2 rounded-lg border border-border/40 shadow-sm">
-            <span className="text-primary/80">demo@atlasbot.com</span>
-            <span className="text-border">|</span>
-            <span className="text-foreground/70">atlasbot2024</span>
-          </div>
         </CardFooter>
       </Card>
     </div>

@@ -6,14 +6,32 @@ dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+interface DocumentChunk {
+  content: string;
+  metadata: {
+    id?: string;
+    title?: string;
+    category?: string;
+    version?: string;
+  };
+  similarity: number;
+}
+
+interface RankedChunk extends DocumentChunk {
+  rrfScore: number;
+}
+
+interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export async function ragQuery(
   question: string,
-  history: { role: string; content: string }[],
+  history: ConversationMessage[],
 ) {
-  // 1. Gerar embedding da pergunta
   const queryEmbedding = await generateEmbedding(question);
 
-  // 2. Busca vetorial no Supabase
   const { data: chunks, error } = await supabase.rpc("match_documents", {
     query_embedding: queryEmbedding,
     match_threshold: 0.5,
@@ -21,15 +39,12 @@ export async function ragQuery(
   });
   if (error) throw new Error(error.message);
 
-  // 3. Reranking simples por RRF (Reciprocal Rank Fusion)
-  const reranked = rerankRRF(chunks);
+  const reranked = rerankRRF(chunks as DocumentChunk[]);
   const topChunks = reranked.slice(0, 5);
 
-  // 4. Construir contexto
-  const context = topChunks.map((c: any) => c.content).join("\n\n---\n\n");
+  const context = topChunks.map((c) => c.content).join("\n\n---\n\n");
 
-  // 5. Gerar resposta com GPT
-  const messages: any[] = [
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     {
       role: "system",
       content: `Você é o AtlasBot, assistente corporativo. Responda apenas com base no contexto fornecido.
@@ -51,14 +66,14 @@ ${context}`,
 
   return {
     answer: completion.choices[0].message.content,
-    sources: topChunks.map((c: any) => ({
+    sources: topChunks.map((c) => ({
       content: c.content,
       ...c.metadata,
     })),
   };
 }
 
-function rerankRRF(chunks: any[], k = 60) {
+function rerankRRF(chunks: DocumentChunk[], k = 60): RankedChunk[] {
   return chunks
     .map((chunk, index) => ({
       ...chunk,

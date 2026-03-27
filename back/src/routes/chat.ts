@@ -5,20 +5,40 @@ import { supabase } from "../config/supabase";
 
 const router = Router();
 
+const MAX_QUESTION_LENGTH = 2000;
+const MAX_HISTORY_MESSAGES = 20;
+
+interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 router.post(
   "/",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<void> => {
     const { question, conversationId } = req.body;
-    if (!question) {
+
+    if (!question || typeof question !== "string") {
       res.status(400).json({ error: "Pergunta obrigatória" });
       return;
     }
 
+    if (question.trim().length === 0) {
+      res.status(400).json({ error: "Pergunta não pode ser vazia" });
+      return;
+    }
+
+    if (question.length > MAX_QUESTION_LENGTH) {
+      res.status(400).json({
+        error: `Pergunta deve ter no máximo ${MAX_QUESTION_LENGTH} caracteres`,
+      });
+      return;
+    }
+
     try {
-      // Buscar histórico
-      let history: any[] = [];
-      let convId = conversationId;
+      let history: ConversationMessage[] = [];
+      let convId: string | undefined = conversationId;
 
       if (convId) {
         const { data } = await supabase
@@ -26,18 +46,20 @@ router.post(
           .select("messages")
           .eq("id", convId)
           .single();
-        if (data) history = data.messages;
+        if (data?.messages) {
+          history = (data.messages as ConversationMessage[]).slice(
+            -MAX_HISTORY_MESSAGES,
+          );
+        }
       }
 
-      // Executar RAG
-      const { answer, sources } = await ragQuery(question, history);
+      const { answer, sources } = await ragQuery(question.trim(), history);
 
-      // Atualizar histórico
-      const updatedHistory = [
+      const updatedHistory: ConversationMessage[] = [
         ...history,
-        { role: "user", content: question },
-        { role: "assistant", content: answer },
-      ];
+        { role: "user" as const, content: question.trim() },
+        { role: "assistant" as const, content: answer ?? "" },
+      ].slice(-MAX_HISTORY_MESSAGES);
 
       if (convId) {
         await supabase
@@ -57,8 +79,10 @@ router.post(
       }
 
       res.json({ answer, sources, conversationId: convId });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erro interno";
+      console.error("[chat] Erro ao processar pergunta:", message);
+      res.status(500).json({ error: "Erro ao processar sua pergunta" });
     }
   },
 );
