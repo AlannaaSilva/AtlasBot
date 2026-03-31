@@ -64,6 +64,11 @@ export function useChat() {
 
         if (!res.ok) {
           const err = await res.json();
+          if (res.status === 401) {
+            localStorage.removeItem("atlasbot_token");
+            window.location.href = "/login";
+            return;
+          }
           throw new Error(err.error || "Erro ao obter resposta");
         }
 
