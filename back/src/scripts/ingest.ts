@@ -25,16 +25,6 @@ function chunkText(text: string, maxTokens = 150): string[] {
 }
 
 async function ingest() {
-  const key = process.env.OPENAI_API_KEY;
-  console.log(`\n🔑 OPENAI_API_KEY: ${key ? key.slice(0, 10) + '...' + key.slice(-4) + ` (${key.length} chars)` : 'NÃO CARREGADA ❌'}`);
-
-  // Teste direto da chave via HTTP
-  const testRes = await fetch('https://api.openai.com/v1/models', {
-    headers: { Authorization: `Bearer ${key}` },
-  });
-  const testBody = await testRes.json() as any;
-  console.log(`🌐 Teste HTTP da chave: ${testRes.status} ${testRes.statusText}`);
-  if (!testRes.ok) console.log('   Detalhe:', JSON.stringify(testBody?.error ?? testBody));
   console.log(`\n🚀 Iniciando ingestão de ${documents.length} documentos...\n`);
 
   let totalChunks = 0;
@@ -48,7 +38,6 @@ async function ingest() {
     for (let i = 0; i < chunks.length; i++) {
       try {
         const embedding = await generateEmbedding(chunks[i]);
-        console.log(`      ✔ embedding gerado (${embedding.length} dims)`);
 
         const { error } = await supabase.from('documents').insert({
           content: chunks[i],
@@ -61,22 +50,13 @@ async function ingest() {
           embedding,
         });
 
-        if (error) throw new Error(`[Supabase] ${error.message}`);
+        if (error) throw new Error(error.message);
         totalChunks++;
 
         // Pequena pausa para não ultrapassar rate limit da OpenAI
         await new Promise(r => setTimeout(r, 200));
       } catch (err: any) {
-        if (errors === 0) {
-          console.error('ERRO COMPLETO:', {
-            name: err.constructor?.name,
-            message: err.message,
-            status: err.status,
-            code: err.code,
-            type: err.type,
-            error: err.error,
-          });
-        }
+        console.error(`   ❌ Erro no chunk ${i}: ${err.message}`);
         errors++;
       }
     }

@@ -8,11 +8,16 @@ import {
   Zap,
   Briefcase,
   Monitor,
-  Code,
+  Shield,
   Rocket,
+  FileText,
+  Users,
+  GraduationCap,
+  Building2,
   type LucideIcon,
 } from "lucide-react";
 import { categories, type Category } from "@/lib/knowledgeBase";
+import { CATEGORY_LABELS } from "@/constants/chat";
 
 interface ChatSidebarProps {
   activeCategory: Category | null;
@@ -22,17 +27,15 @@ interface ChatSidebarProps {
 }
 
 const categoryIcons: Record<Category, LucideIcon> = {
-  "HR Policies": Briefcase,
-  "IT Support": Monitor,
-  "Engineering Docs": Code,
-  Onboarding: Rocket,
-};
-
-const categoryLabels: Record<Category, string> = {
-  "HR Policies": "Políticas de RH",
-  "IT Support": "Suporte de TI",
-  "Engineering Docs": "Docs de Engenharia",
-  Onboarding: "Integração",
+  rh: Briefcase,
+  ti: Monitor,
+  onboarding: Rocket,
+  processos: FileText,
+  seguranca: Shield,
+  lgpd: Shield,
+  etica: Users,
+  treinamento: GraduationCap,
+  empresa: Building2,
 };
 
 export function ChatSidebar({
@@ -114,7 +117,7 @@ export function ChatSidebar({
                     : "text-sidebar-muted"
                 }
               />
-              <span className="flex-1">{categoryLabels[cat]}</span>
+              <span className="flex-1">{CATEGORY_LABELS[cat]}</span>
               <ChevronRight
                 size={14}
                 className="opacity-0 group-hover:opacity-60 transition-opacity text-sidebar-primary"

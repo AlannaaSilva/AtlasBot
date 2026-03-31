@@ -1,10 +1,15 @@
 import { Category } from "@/lib/knowledgeBase";
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  "HR Policies": "Políticas de RH",
-  "IT Support": "Suporte de TI",
-  "Engineering Docs": "Docs de Engenharia",
-  "Onboarding": "Integração",
+  rh: "RH",
+  ti: "TI",
+  onboarding: "Onboarding",
+  processos: "Processos",
+  seguranca: "Segurança",
+  lgpd: "LGPD",
+  etica: "Ética",
+  treinamento: "Treinamento",
+  empresa: "Empresa",
 };
 
 export const EXAMPLE_QUERIES = [

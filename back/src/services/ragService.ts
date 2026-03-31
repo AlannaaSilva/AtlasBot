@@ -1,10 +1,5 @@
-import OpenAI from "openai";
 import { supabase } from "../config/supabase";
 import { generateEmbedding } from "./embeddingService";
-import dotenv from "dotenv";
-dotenv.config();
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface DocumentChunk {
   content: string;
@@ -44,7 +39,7 @@ export async function ragQuery(
 
   const context = topChunks.map((c) => c.content).join("\n\n---\n\n");
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+  const messages = [
     {
       role: "system",
       content: `Você é o AtlasBot, assistente corporativo. Responda apenas com base no contexto fornecido.
@@ -57,12 +52,26 @@ ${context}`,
     { role: "user", content: question },
   ];
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-    temperature: 0.2,
-    max_tokens: 800,
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages,
+      temperature: 0.2,
+      max_tokens: 800,
+    }),
   });
+
+  if (!res.ok) {
+    const err = (await res.json()) as any;
+    throw new Error(err.error?.message ?? `HTTP ${res.status}`);
+  }
+
+  const completion = (await res.json()) as any;
 
   return {
     answer: completion.choices[0].message.content,
