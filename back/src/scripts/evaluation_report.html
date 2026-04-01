@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Avaliação RAG — AtlasBot</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 32px; }
+    h1 { font-size: 1.8rem; font-weight: 700; color: #a78bfa; margin-bottom: 4px; }
+    .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 32px; }
+    h2 { font-size: 1.1rem; color: #c4b5fd; margin-bottom: 16px; border-left: 3px solid #7c3aed; padding-left: 12px; }
+    .section { background: #1e2130; border-radius: 12px; padding: 24px; margin-bottom: 28px; border: 1px solid #2d3148; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    canvas { max-height: 280px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th { background: #2d3148; color: #a78bfa; text-align: left; padding: 10px 12px; font-weight: 600; }
+    td { padding: 9px 12px; border-bottom: 1px solid #2d3148; color: #cbd5e1; }
+    tr:hover td { background: #252840; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; }
+    .badge-default { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
+    .meta { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+    .meta-card { background: #252840; border-radius: 8px; padding: 16px 20px; border: 1px solid #2d3148; }
+    .meta-card .val { font-size: 1.6rem; font-weight: 700; color: #a78bfa; }
+    .meta-card .lbl { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<h1>⚡ AtlasBot — Avaliação Experimental do Pipeline RAG</h1>
+<p class="subtitle">Gerado em 01/04/2026, 14:38:09 · 12 configurações · 8 perguntas por configuração</p>
+
+<div class="meta">
+  <div class="meta-card"><div class="val">12</div><div class="lbl">Configurações testadas</div></div>
+  <div class="meta-card"><div class="val">8</div><div class="lbl">Perguntas de avaliação</div></div>
+  <div class="meta-card"><div class="val">96</div><div class="lbl">Total de inferências</div></div>
+  <div class="meta-card"><div class="val">text-embedding-3-small</div><div class="lbl">Modelo de embedding</div></div>
+  <div class="meta-card"><div class="val">gpt-4o-mini</div><div class="lbl">Modelo de geração</div></div>
+  <div class="meta-card"><div class="val">RRF</div><div class="lbl">Estratégia de reranking</div></div>
+</div>
+
+<div class="section grid2">
+  <div>
+    <h2>Similaridade Média por Configuração</h2>
+    <canvas id="chartSim"></canvas>
+  </div>
+  <div>
+    <h2>Cobertura de Palavras-Chave (%)</h2>
+    <canvas id="chartCov"></canvas>
+  </div>
+</div>
+
+<div class="section grid2">
+  <div>
+    <h2>Chunks Recuperados (média)</h2>
+    <canvas id="chartChunks"></canvas>
+  </div>
+  <div>
+    <h2>Latência Média (ms)</h2>
+    <canvas id="chartLatency"></canvas>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Tabela Comparativa Completa</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Configuração</th>
+        <th>Threshold</th>
+        <th>match_count</th>
+        <th>top_k</th>
+        <th>RRF k</th>
+        <th>Chunks (média)</th>
+        <th>Similaridade (média)</th>
+        <th>Cobertura</th>
+        <th>Latência Retrieval</th>
+        <th>Latência Geração</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Threshold 0.3</td>
+      <td>0.3</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>5</td>
+      <td>0.568</td>
+      <td>89.6%</td>
+      <td>607.5 ms</td>
+      <td>4122.1 ms</td>
+    </tr>
+    <tr>
+      <td>Threshold 0.5 (padrão)</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>409.6 ms</td>
+      <td>3711.5 ms</td>
+    </tr>
+    <tr>
+      <td>Threshold 0.7</td>
+      <td>0.7</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>1</td>
+      <td>0.5454</td>
+      <td>70.8%</td>
+      <td>419.4 ms</td>
+      <td>3725.8 ms</td>
+    </tr>
+    <tr>
+      <td>match_count=10</td>
+      <td>0.5</td>
+      <td>10</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>319.4 ms</td>
+      <td>2737.9 ms</td>
+    </tr>
+    <tr>
+      <td>match_count=20 (padrão)</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>392.8 ms</td>
+      <td>3202.3 ms</td>
+    </tr>
+    <tr>
+      <td>match_count=30</td>
+      <td>0.5</td>
+      <td>30</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>376.6 ms</td>
+      <td>4370.8 ms</td>
+    </tr>
+    <tr>
+      <td>top_k=3</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>3</td>
+      <td>60</td>
+      <td>2.63</td>
+      <td>0.64</td>
+      <td>89.6%</td>
+      <td>469.8 ms</td>
+      <td>3529 ms</td>
+    </tr>
+    <tr>
+      <td>top_k=5 (padrão)</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>437.4 ms</td>
+      <td>3933.3 ms</td>
+    </tr>
+    <tr>
+      <td>top_k=7</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>7</td>
+      <td>60</td>
+      <td>4</td>
+      <td>0.6097</td>
+      <td>89.6%</td>
+      <td>415.5 ms</td>
+      <td>3077.8 ms</td>
+    </tr>
+    <tr>
+      <td>RRF k=20</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>20</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>341.4 ms</td>
+      <td>2906.8 ms</td>
+    </tr>
+    <tr>
+      <td>RRF k=60 (padrão)</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>60</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>379.4 ms</td>
+      <td>2899.9 ms</td>
+    </tr>
+    <tr>
+      <td>RRF k=100</td>
+      <td>0.5</td>
+      <td>20</td>
+      <td>5</td>
+      <td>100</td>
+      <td>3.63</td>
+      <td>0.6156</td>
+      <td>89.6%</td>
+      <td>386.6 ms</td>
+      <td>3099.6 ms</td>
+    </tr></tbody>
+  </table>
+</div>
+
+<script>
+const labels = ["Threshold 0.3","Threshold 0.5 (padrão)","Threshold 0.7","match_count=10","match_count=20 (padrão)","match_count=30","top_k=3","top_k=5 (padrão)","top_k=7","RRF k=20","RRF k=60 (padrão)","RRF k=100"];
+const colors = labels.map((_, i) => `hsl(${200 + i * 15}, 70%, 60%)`);
+const borderColors = labels.map((_, i) => `hsl(${200 + i * 15}, 80%, 50%)`);
+
+function barChart(id, data, label, color) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label, data, backgroundColor: colors, borderColor: borderColors, borderWidth: 1.5, borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#2d3148' } },
+        y: { ticks: { color: '#94a3b8' }, grid: { color: '#2d3148' } }
+      }
+    }
+  });
+}
+
+barChart('chartSim', [0.568,0.6156,0.5454,0.6156,0.6156,0.6156,0.64,0.6156,0.6097,0.6156,0.6156,0.6156], 'Similaridade média', '#a78bfa');
+barChart('chartCov', [89.6,89.6,70.8,89.6,89.6,89.6,89.6,89.6,89.6,89.6,89.6,89.6], 'Cobertura (%)', '#34d399');
+barChart('chartChunks', [5,3.63,1,3.63,3.63,3.63,2.63,3.63,4,3.63,3.63,3.63], 'Chunks recuperados', '#60a5fa');
+
+new Chart(document.getElementById('chartLatency'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Retrieval (ms)', data: [607.5,409.6,419.4,319.4,392.8,376.6,469.8,437.4,415.5,341.4,379.4,386.6], backgroundColor: '#818cf8aa', borderColor: '#818cf8', borderWidth: 1.5, borderRadius: 6 },
+      { label: 'Geração (ms)',   data: [4122.1,3711.5,3725.8,2737.9,3202.3,4370.8,3529,3933.3,3077.8,2906.8,2899.9,3099.6], backgroundColor: '#f472b6aa', borderColor: '#f472b6', borderWidth: 1.5, borderRadius: 6 },
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#94a3b8' } } },
+    scales: {
+      x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#2d3148' } },
+      y: { ticks: { color: '#94a3b8' }, grid: { color: '#2d3148' } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

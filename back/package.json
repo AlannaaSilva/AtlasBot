@@ -7,7 +7,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "ingest": "DOTENV_CONFIG_OVERRIDE=true ts-node-dev --transpile-only -r dotenv/config src/scripts/ingest.ts"
+    "ingest": "DOTENV_CONFIG_OVERRIDE=true ts-node-dev --transpile-only -r dotenv/config src/scripts/ingest.ts",
+    "evaluate": "ts-node --transpile-only src/scripts/evaluate.ts"
   },
   "keywords": [],
   "author": "",
