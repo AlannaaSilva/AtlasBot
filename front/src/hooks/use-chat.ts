@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { type ChatMessage, type KBDocument } from "@/lib/knowledgeBase";
+import { type ChatMessage, type KBDocument, type Category } from "@/lib/knowledgeBase";
 import { RetrievalStage, RETRIEVAL_STAGES } from "@/constants/chat";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -27,7 +27,7 @@ export function useChat() {
   }, []);
 
   const handleSubmit = useCallback(
-    async (query: string) => {
+    async (query: string, category: Category | null = null) => {
       setIsProcessing(true);
 
       // Adiciona mensagem do usuário
@@ -59,6 +59,7 @@ export function useChat() {
           body: JSON.stringify({
             question: query,
             conversationId,
+            category,
           }),
         });
 

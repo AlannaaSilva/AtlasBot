@@ -46,7 +46,7 @@ export default function Index({ onLogout }: IndexProps) {
 
   const onMessageSubmit = async (query: string) => {
     setRecentQueries((prev) => [query, ...prev.filter((q) => q !== query)]);
-    await handleSubmit(query);
+    await handleSubmit(query, activeCategory);
   };
 
   return (
@@ -164,6 +164,7 @@ export default function Index({ onLogout }: IndexProps) {
           onSubmit={onMessageSubmit}
           isProcessing={isProcessing}
           activeCategory={activeCategory}
+          onClearCategory={() => setActiveCategory(null)}
         />
       </main>
 

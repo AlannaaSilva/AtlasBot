@@ -17,7 +17,7 @@ router.post(
   "/",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { question, conversationId } = req.body;
+    const { question, conversationId, category } = req.body;
 
     if (!question || typeof question !== "string") {
       res.status(400).json({ error: "Pergunta obrigatória" });
@@ -53,7 +53,7 @@ router.post(
         }
       }
 
-      const { answer, sources } = await ragQuery(question.trim(), history);
+      const { answer, sources } = await ragQuery(question.trim(), history, category ?? null);
 
       const updatedHistory: ConversationMessage[] = [
         ...history,

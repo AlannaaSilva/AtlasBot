@@ -24,14 +24,21 @@ interface ConversationMessage {
 export async function ragQuery(
   question: string,
   history: ConversationMessage[],
+  category: string | null = null,
 ) {
   const queryEmbedding = await generateEmbedding(question);
 
-  const { data: chunks, error } = await supabase.rpc("match_documents", {
+  let query = supabase.rpc("match_documents", {
     query_embedding: queryEmbedding,
     match_threshold: 0.5,
     match_count: 20,
   });
+
+  if (category) {
+    query = query.eq("metadata->>category", category);
+  }
+
+  const { data: chunks, error } = await query;
   if (error) throw new Error(error.message);
 
   const reranked = rerankRRF(chunks as DocumentChunk[]);
@@ -43,6 +50,8 @@ export async function ragQuery(
     {
       role: "system",
       content: `Você é o AtlasBot, assistente corporativo da Techsfera. Seu tom é profissional mas amigável e acolhedor.
+
+${category ? `FILTRO ATIVO: a busca está limitada à categoria "${category}". Se não encontrar a informação, avise o usuário que o filtro de categoria está ativo e sugira desativá-lo para uma busca mais ampla.` : ""}
 
 Regras:
 - Se a pergunta for respondida pelo contexto abaixo, responda com base nele de forma clara e objetiva.

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowUp, Loader2 } from "lucide-react";
+import { ArrowUp, Loader2, X } from "lucide-react";
 import { CATEGORY_LABELS } from "@/constants/chat";
 import type { Category } from "@/lib/knowledgeBase";
 
@@ -7,9 +7,10 @@ interface ChatInputProps {
   onSubmit: (message: string) => void;
   isProcessing: boolean;
   activeCategory: Category | null;
+  onClearCategory?: () => void;
 }
 
-export function ChatInput({ onSubmit, isProcessing, activeCategory }: ChatInputProps) {
+export function ChatInput({ onSubmit, isProcessing, activeCategory, onClearCategory }: ChatInputProps) {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -30,8 +31,17 @@ export function ChatInput({ onSubmit, isProcessing, activeCategory }: ChatInputP
         {activeCategory && (
           <div className="flex items-center gap-2 px-1">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-[11px] font-medium text-accent-foreground bg-accent/70 px-2.5 py-1 rounded-full border border-primary/20">
+            <span className="flex items-center gap-1.5 text-[11px] font-medium text-accent-foreground bg-accent/70 pl-2.5 pr-1.5 py-1 rounded-full border border-primary/20">
               {CATEGORY_LABELS[activeCategory]}
+              {onClearCategory && (
+                <button
+                  onClick={onClearCategory}
+                  className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                  title="Remover filtro"
+                >
+                  <X size={11} />
+                </button>
+              )}
             </span>
           </div>
         )}
