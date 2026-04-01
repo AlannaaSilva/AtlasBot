@@ -15,7 +15,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
 export const EXAMPLE_QUERIES = [
   { text: "Como solicitar férias?", icon: "🏖️" },
   { text: "Como abrir um chamado de suporte?", icon: "🎫" },
-  { text: "Qual é o processo de deploy?", icon: "🚀" },
+  { text: "Como solicitar reembolso de despesas?", icon: "💰" },
   { text: "Onde encontro a documentação de onboarding?", icon: "📋" },
 ];
 

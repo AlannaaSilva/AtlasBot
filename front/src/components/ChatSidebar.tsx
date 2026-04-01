@@ -73,6 +73,9 @@ export function ChatSidebar({
         </span>
       </div>
 
+      {/* Scrollable middle section */}
+      <div className="flex-1 overflow-y-auto flex flex-col gap-5 min-h-0">
+
       {/* Categories */}
       <nav className="space-y-1">
         <div className="px-3 mb-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted flex items-center gap-2">
@@ -151,7 +154,9 @@ export function ChatSidebar({
         </div>
       )}
 
-      <div className="mt-auto p-4 rounded-xl bg-gradient-to-br from-sidebar-accent/50 to-sidebar-accent/30 border border-sidebar-border">
+      </div>{/* end scrollable middle section */}
+
+      <div className="p-4 rounded-xl bg-gradient-to-br from-sidebar-accent/50 to-sidebar-accent/30 border border-sidebar-border">
         <div className="flex items-start gap-2">
           <Sparkles
             size={14}
